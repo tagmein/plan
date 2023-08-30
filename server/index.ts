@@ -19,6 +19,7 @@ const contentTypes = {
 Object.entries({
  'favicon.ico': '/favicon.ico',
  'index.html': '/',
+ 'plan-logo.png': '/plan-logo.png',
  'require.js': '/require.js',
 }).map(function ([file, url]) {
  const extension = file.split('.').pop() as keyof typeof contentTypes
@@ -34,6 +35,7 @@ Object.entries({
 })
 
 app.use('/client', express.static(path.join(__dirname, '..', 'client-dist')))
+app.use('/client', express.static(path.join(__dirname, '..', 'client')))
 
 app.use(express.json())
 

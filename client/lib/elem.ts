@@ -1,7 +1,10 @@
-export function elem(tagName: string, ...classNames: string[]) {
+export function elem<TElement = HTMLDivElement>(
+ tagName: string,
+ ...classNames: string[]
+): TElement {
  const e = document.createElement(tagName)
  if (classNames.length) {
   e.classList.add(...classNames)
  }
- return e
+ return e as TElement
 }

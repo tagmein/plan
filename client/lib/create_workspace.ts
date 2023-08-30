@@ -17,9 +17,9 @@ export interface Workspace extends HTMLDivElement {
 }
 
 export function create_workspace(app: App) {
- const workspace: Partial<Workspace> = elem('div', 'workspace')
+ const workspace = elem('div', 'workspace') as Workspace
  workspace.route = function (path) {
   console.log('route workspace', path)
  }
- return workspace as Workspace
+ return workspace
 }

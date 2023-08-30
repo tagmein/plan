@@ -4,6 +4,7 @@ import { Workspace, create_workspace } from './create_workspace'
 export interface App {
  schedule: Schedule
  workspace: Workspace
+ navigate_home(): void
  navigate_schedule(path: string): void
  navigate_workspace(path: string): void
  route(hash: string): void
@@ -19,14 +20,19 @@ export function create_app(navigate: (path: string) => void): App {
   }
   return parts
  }
- const navigate_part = Array(PATH_PART_COUNT).map(function (index) {
-  return function (new_path: string) {
-   const paths = get_path_parts()
-   paths[index] = new_path
-   navigate(paths.join('#'))
-  }
- })
+ const navigate_part = Array(PATH_PART_COUNT)
+  .fill(null)
+  .map(function (_, index) {
+   return function (new_path: string) {
+    const paths = get_path_parts()
+    paths[index] = new_path
+    navigate(paths.join('#'))
+   }
+  })
  const app: App = {
+  navigate_home: function () {
+   navigate(Array(PATH_PART_COUNT).fill('/').join('#'))
+  },
   navigate_schedule: navigate_part[0],
   navigate_workspace: navigate_part[1],
   route(path) {

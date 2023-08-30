@@ -15,6 +15,11 @@ body {
  overflow: hidden;
  padding: 0;
 }
+
+*:focus {
+ box-shadow: inset 0 0 0 2px #eeeeee;
+ outline: none;
+}
 `
 
 const app = create_app(function (path: string) {
