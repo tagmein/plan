@@ -30,6 +30,13 @@ const time_options: {
  hour: generate_hour_options,
 }
 
+const TIME_PROPERTY_ARRAY: [
+ TimePropertyName,
+ TimePropertyName,
+ TimePropertyName,
+ TimePropertyName,
+] = ['year', 'month', 'day', 'hour']
+
 export function create_time_buttons(
  create_button: (label: string, on_click: () => void) => HTMLButtonElement,
  on_change_time: (
@@ -40,9 +47,7 @@ export function create_time_buttons(
  ) => void,
 ): TimeButtonsControl {
  let auto_time_interval: NodeJS.Timeout
- const select_time = (
-  ['year', 'month', 'day', 'hour'] as TimePropertyName[]
- ).map(function (time_property: TimePropertyName) {
+ const select_time = TIME_PROPERTY_ARRAY.map(function (time_property, index) {
   return function () {
    const options = time_options[time_property]
    select(
@@ -53,7 +58,8 @@ export function create_time_buttons(
         parseInt(control.selected_time[1], 10),
        )
      : options,
-    set_time_property[time_property],
+    set_time_property[time_property].and(select_time?.[index + 1]),
+    control.selected_time[TIME_PROPERTY_ARRAY.indexOf(time_property)],
    )
   }
  }) as [() => void, () => void, () => void, () => void]

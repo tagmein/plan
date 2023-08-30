@@ -1,4 +1,4 @@
-globalThis.__dirname = ''
+import './environment'
 
 import { add_style } from './lib/add_style'
 import { create_app } from './lib/create_app'

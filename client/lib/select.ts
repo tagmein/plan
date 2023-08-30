@@ -45,12 +45,18 @@ add_style`
 .select_panel .option:active {
  background-color: #a0a0a0;
 }
+
+.select_panel .option[data-selected="true"] {
+ background-color: #1b1b1b;
+ color: #eeeeee;
+}
 `
 
 export function select(
  element: HTMLElement,
  options: [string, string][],
  on_select: (value: string) => void,
+ selected_value?: string,
 ) {
  if (typeof (element as any).close_select === 'function') {
   ;(element as any).close_select()
@@ -100,6 +106,16 @@ export function select(
    close()
    on_select(value)
   })
+  if (value === selected_value) {
+   option.setAttribute('data-selected', 'true')
+   setTimeout(function () {
+    option.scrollIntoView({
+     behavior: 'smooth',
+     block: 'center',
+     inline: 'center',
+    })
+   }, 0)
+  }
  }
  document.body.appendChild(select_panel)
  reposition()
