@@ -42,6 +42,29 @@ add_style`
  top: 0;
  white-space: pre;
 }
+.current_time_mark {
+ box-shadow: 0 0 2px #a4000080;
+ background-color: #a4000080;
+ height: 1px;
+ left: 0;
+ position: absolute;
+ right: 0;
+ overflow: visible;
+ mix-blend-mode: darken;
+}
+.current_time_mark::after {
+ background-color: #a40000;
+ box-shadow: 0 0 2px #a4000080;
+ content: '';
+ display: block;
+ width: 7px;
+ height: 7px;
+ position: absolute;
+ transform-origin: center;
+ transform: rotate(45deg);
+ right: -4px;
+ top: -3px;
+}
 `
 
 export const HOUR_BLOCK_HEIGHT = 50
@@ -51,6 +74,8 @@ export interface TimeBlock extends HTMLDivElement {
  inner: HTMLDivElement
  remove_block(): void
  scale_to(scale: number): void
+ remove_current_time_mark(): void
+ set_current_time_mark(fraction: number): void
 }
 
 export function create_time_block(
@@ -99,5 +124,19 @@ export function create_time_block(
  mark_lines.push(`${hour.padStart(2, ' ')}:00`)
  time_mark.textContent = mark_lines.join('\n')
  block.inner.appendChild(time_mark)
+ let current_time_mark: HTMLDivElement | undefined
+ block.remove_current_time_mark = function () {
+  if (current_time_mark) {
+   block.removeChild(current_time_mark)
+   current_time_mark = undefined
+  }
+ }
+ block.set_current_time_mark = function (fraction: number) {
+  if (!current_time_mark) {
+   current_time_mark = elem<HTMLDivElement>('div', 'current_time_mark')
+   block.appendChild(current_time_mark)
+  }
+  current_time_mark.style.top = `${fraction * 100}%`
+ }
  return block
 }

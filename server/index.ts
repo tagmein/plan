@@ -45,7 +45,7 @@ app.post('/data', async function (req: Request, res: Response, next) {
    filename: path.join(__dirname, '..', 'data', 'example-user.db'),
    driver: sqlite3.cached.Database,
   })
-  const result = await db.all(req.body.query)
+  const result = await db.all(req.body.query, ...(req.body.params ?? []))
   const response_data = JSON.stringify(result)
   res.status(200)
   res.set({

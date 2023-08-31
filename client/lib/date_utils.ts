@@ -144,3 +144,11 @@ export function generate_next_hours(
  }
  return times
 }
+
+export function time_is_equal(a: TimeArray, b: TimeArray) {
+ return !a.some((x, i) => x !== b[i])
+}
+
+export function get_now_minutes() {
+ return new Date().getMinutes()
+}

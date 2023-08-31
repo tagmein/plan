@@ -5,6 +5,8 @@ import {
  generate_next_hours,
  generate_previous_hours,
  get_current_time,
+ get_now_minutes,
+ time_is_equal,
 } from '../date_utils'
 import { elem } from '../element_utils'
 import {
@@ -31,6 +33,7 @@ export interface TimeWindowControl {
 
 export function create_time_window(app: App): TimeWindowControl {
  let auto_time_interval: NodeJS.Timeout
+ let block_with_current_time: TimeBlock | undefined
  const control: TimeWindowControl = {
   container: elem('div', 'time_window'),
   selected_time: ['', '', '', ''],
@@ -40,6 +43,7 @@ export function create_time_window(app: App): TimeWindowControl {
     use_current_time()
     auto_time_interval = setInterval(use_current_time, 60e3)
    } else {
+    auto_time_interval = setInterval(render, 60e3)
     const current_time = get_current_time()
     control.selected_time = [year, month, day, hour].map(
      function (time, index) {
@@ -123,6 +127,7 @@ export function create_time_window(app: App): TimeWindowControl {
    blocks_around_count,
   )
   const just_rendered_block_ids = new Set<string>()
+  const now = get_current_time()
   const [blocks_pre, blocks_mid, blocks_post] = [
    hours_pre,
    hours_mid,
@@ -130,6 +135,15 @@ export function create_time_window(app: App): TimeWindowControl {
   ].map(function (hours_group) {
    return hours_group.map(function (time_array, index) {
     const block = get_hour_block(...time_array)
+    if (time_is_equal(now, time_array)) {
+     if (block_with_current_time !== block) {
+      if (block_with_current_time) {
+       block_with_current_time.remove_current_time_mark()
+      }
+      block_with_current_time = block
+     }
+     block_with_current_time.set_current_time_mark(get_now_minutes() / 60)
+    }
     rendered_hour_block_ids.add(block.block_id)
     just_rendered_block_ids.add(block.block_id)
     control.container.appendChild(block)
