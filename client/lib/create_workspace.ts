@@ -1,6 +1,6 @@
 import { add_style } from './add_style'
 import { App } from './create_app'
-import { elem } from './elem'
+import { elem } from './element_utils'
 
 add_style`
 .workspace {

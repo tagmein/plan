@@ -1,8 +1,15 @@
 import { add_style } from './add_style'
 import { App } from './create_app'
-import { TimeButtonsControl, create_time_buttons } from './create_time_buttons'
 import { Toolbar, create_toolbar } from './create_toolbar'
-import { elem } from './elem'
+import { elem } from './element_utils'
+import {
+ TimeButtonsControl,
+ create_time_buttons,
+} from './schedule/create_time_buttons'
+import {
+ TimeWindowControl,
+ create_time_window,
+} from './schedule/create_time_window'
 
 add_style`
 .schedule {
@@ -34,9 +41,10 @@ add_style`
 `
 
 export interface Schedule extends HTMLDivElement {
- time_buttons: TimeButtonsControl
- toolbar: Toolbar
  route(path: string): void
+ time_buttons: TimeButtonsControl
+ time_window: TimeWindowControl
+ toolbar: Toolbar
 }
 
 export function create_schedule(app: App) {
@@ -52,10 +60,13 @@ export function create_schedule(app: App) {
    app.navigate_schedule(['', year, month, day, hour].join('/'))
   },
  )
+ schedule.time_window = create_time_window()
  schedule.appendChild(schedule.toolbar)
+ schedule.appendChild(schedule.time_window.container)
  schedule.route = function (path) {
   const [_, year = '', month = '', day = '', hour = ''] = path.split('/')
   schedule.time_buttons.set_time(year, month, day, hour)
+  schedule.time_window.set_time(year, month, day, hour)
  }
  return schedule
 }

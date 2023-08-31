@@ -1,11 +1,6 @@
-globalThis.__dirname = ''
+/// <reference path="./types/global.d.ts" />
 
-interface Function {
- and<T extends (...args: any[]) => any>(
-  this: T,
-  next?: () => any,
- ): (this: T, ...args: Parameters<T>) => void
-}
+globalThis.__dirname = ''
 
 Function.prototype.and = function (next) {
  const me = this

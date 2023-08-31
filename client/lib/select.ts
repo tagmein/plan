@@ -1,14 +1,13 @@
 import { add_style } from './add_style'
 import { DELAY } from './constants'
-import { elem } from './elem'
-import { closest_visible_element } from './element_utils'
+import { closest_visible_element, elem } from './element_utils'
 
 add_style`
 .selecting {
  background-color: #a0a0a0 !important;
 }
 .select_shade {
- background-color: #00000040;
+ background-color: #80808040;
  position: fixed;
  top: 0;
  left: 0;

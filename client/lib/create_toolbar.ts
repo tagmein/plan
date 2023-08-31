@@ -1,5 +1,5 @@
 import { add_style } from './add_style'
-import { elem } from './elem'
+import { elem } from './element_utils'
 
 add_style`
 .toolbar {

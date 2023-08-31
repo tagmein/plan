@@ -1,21 +1,25 @@
-import { DELAY, MONTH_NAMES } from './constants'
+/// <reference path="../../types/global.d.ts" />
+
+import { DELAY, MONTH_NAMES } from '../constants'
 import {
+ TIME_PROPERTY_ARRAY,
+ TimeArray,
+ TimePropertyName,
  generate_day_options,
  generate_hour_options,
  generate_month_options,
  generate_year_options,
+ get_current_time,
  ordinal_day,
-} from './date_utils'
-import { select } from './select'
-
-type TimePropertyName = 'year' | 'month' | 'day' | 'hour'
+} from '../date_utils'
+import { select } from '../select'
 
 export interface TimeButtonsControl {
  year: HTMLButtonElement
  month: HTMLButtonElement
  day: HTMLButtonElement
  hour: HTMLButtonElement
- selected_time: [string, string, string, string]
+ selected_time: TimeArray
  set_time(year: string, month: string, day: string, hour: string): void
 }
 
@@ -29,13 +33,6 @@ const time_options: {
  day: generate_day_options,
  hour: generate_hour_options,
 }
-
-const TIME_PROPERTY_ARRAY: [
- TimePropertyName,
- TimePropertyName,
- TimePropertyName,
- TimePropertyName,
-] = ['year', 'month', 'day', 'hour']
 
 export function create_time_buttons(
  create_button: (label: string, on_click: () => void) => HTMLButtonElement,
@@ -89,23 +86,10 @@ export function create_time_buttons(
       const int = parseInt(time, 10)
       return isNaN(int) ? current_time[index] : int.toString(10)
      },
-    ) as [string, string, string, string]
+    ) as TimeArray
     set_time_button_labels(...control.selected_time)
    }
   },
- }
- function get_current_time() {
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = now.getMonth() + 1
-  const day = now.getDate()
-  const hour = now.getHours()
-  return [year, month, day, hour].map((x) => x.toString(10)) as [
-   string,
-   string,
-   string,
-   string,
-  ]
  }
  function set_time_button_labels(
   year: string,

@@ -60,3 +60,87 @@ export function generate_year_options(): [string, string][] {
  }
  return years
 }
+
+export type TimePropertyName = 'year' | 'month' | 'day' | 'hour'
+
+export const TIME_PROPERTY_ARRAY: [
+ TimePropertyName,
+ TimePropertyName,
+ TimePropertyName,
+ TimePropertyName,
+] = ['year', 'month', 'day', 'hour']
+
+export type TimeArray = [string, string, string, string]
+
+export function get_current_time() {
+ const now = new Date()
+ const year = now.getFullYear()
+ const month = now.getMonth() + 1
+ const day = now.getDate()
+ const hour = now.getHours()
+ return [year, month, day, hour].map((x) => x.toString(10)) as TimeArray
+}
+
+export function generate_previous_hours(
+ year: string,
+ month: string,
+ day: string,
+ hour: string,
+ count: number,
+): TimeArray[] {
+ let [Y, M, D, H] = [year, month, day, hour].map((x) => parseInt(x, 10))
+ const times: TimeArray[] = []
+ for (let i = 0; i < count; i++) {
+  H--
+  if (H < 0) {
+   D--
+   if (D < 1) {
+    M--
+    if (M < 1) {
+     Y--
+     M = 12
+    }
+    D = is_leap_year(Y)
+     ? DAYS_IN_MONTH_LEAP_YEAR[M - 1]
+     : DAYS_IN_MONTH_NORMAL_YEAR[M - 1]
+   }
+   H = 23
+  }
+  times.unshift([Y, M, D, H].map((x) => x.toString(10)) as TimeArray)
+ }
+ return times
+}
+
+export function generate_next_hours(
+ year: string,
+ month: string,
+ day: string,
+ hour: string,
+ count: number,
+): TimeArray[] {
+ let [Y, M, D, H] = [year, month, day, hour].map((x) => parseInt(x, 10))
+ const times: TimeArray[] = []
+ let max_days_in_month = is_leap_year(Y)
+  ? DAYS_IN_MONTH_LEAP_YEAR[M - 1]
+  : DAYS_IN_MONTH_NORMAL_YEAR[M - 1]
+ for (let i = 0; i < count; i++) {
+  H++
+  if (H > 23) {
+   D++
+   if (D > max_days_in_month) {
+    M++
+    if (M > 12) {
+     Y++
+     M = 1
+    }
+    D = 1
+    max_days_in_month = is_leap_year(Y)
+     ? DAYS_IN_MONTH_LEAP_YEAR[M - 1]
+     : DAYS_IN_MONTH_NORMAL_YEAR[M - 1]
+   }
+   H = 0
+  }
+  times.push([Y, M, D, H].map((x) => x.toString(10)) as TimeArray)
+ }
+ return times
+}
