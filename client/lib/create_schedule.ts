@@ -60,7 +60,7 @@ export function create_schedule(app: App) {
    app.navigate_schedule(['', year, month, day, hour].join('/'))
   },
  )
- schedule.time_window = create_time_window()
+ schedule.time_window = create_time_window(app)
  schedule.appendChild(schedule.toolbar)
  schedule.appendChild(schedule.time_window.container)
  schedule.route = function (path) {

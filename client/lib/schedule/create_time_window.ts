@@ -1,3 +1,4 @@
+import { App } from '../create_app'
 import { add_style } from '../add_style'
 import {
  TimeArray,
@@ -28,7 +29,7 @@ export interface TimeWindowControl {
  set_time(year: string, month: string, day: string, hour: string): void
 }
 
-export function create_time_window(): TimeWindowControl {
+export function create_time_window(app: App): TimeWindowControl {
  let auto_time_interval: NodeJS.Timeout
  const control: TimeWindowControl = {
   container: elem('div', 'time_window'),
@@ -50,6 +51,29 @@ export function create_time_window(): TimeWindowControl {
    }
   },
  }
+ let wheel_speed = 0
+ let wheel_accumulator = 0
+ control.container.addEventListener('wheel', function (event) {
+  if (wheel_speed === 0) {
+   wheel_speed = Math.abs(event.deltaY)
+  }
+  wheel_accumulator += Math.floor(event.deltaY / wheel_speed)
+  if (wheel_accumulator > 0) {
+   const next = generate_next_hours(
+    ...control.selected_time,
+    wheel_accumulator,
+   ).pop()!
+   wheel_accumulator = 0
+   app.navigate_schedule([''].concat(next).join('/'))
+  } else if (wheel_accumulator < 0) {
+   const previous = generate_previous_hours(
+    ...control.selected_time,
+    -wheel_accumulator,
+   ).shift()!
+   wheel_accumulator = 0
+   app.navigate_schedule([''].concat(previous).join('/'))
+  }
+ })
  function use_current_time() {
   control.selected_time = get_current_time()
   render()
@@ -63,7 +87,6 @@ export function create_time_window(): TimeWindowControl {
   hour: string,
  ) {
   const id = `${year}-${month}-${day}-${hour}`
-  console.log(id)
   if (cached_hour_blocks.has(id)) {
    return cached_hour_blocks.get(id)!
   }
@@ -75,12 +98,10 @@ export function create_time_window(): TimeWindowControl {
   const time_window_height = control.container.getBoundingClientRect().height
   const [view_year, view_month, view_day, view_hour] = control.selected_time
   const num_full_size_blocks = Math.max(
-   1,
+   2,
    Math.floor((time_window_height * 0.5) / HOUR_BLOCK_HEIGHT),
   )
-  const size_around =
-   (time_window_height - num_full_size_blocks * HOUR_BLOCK_HEIGHT) / 2
-  const blocks_around_count = num_full_size_blocks
+  const blocks_around_count = Math.max(4, num_full_size_blocks)
   const hours_pre = generate_previous_hours(
    view_year,
    view_month,
@@ -120,18 +141,18 @@ export function create_time_window(): TimeWindowControl {
     rendered_hour_block_ids.delete(id)
     const block = cached_hour_blocks.get(id)
     if (block) {
-     control.container.removeChild(block)
+     block.remove_block()
     }
    }
   })
   blocks_pre.map(function (block, index) {
-   block.scale_to((1 + index) / (1 + blocks_around_count))
+   block.scale_to(index / blocks_around_count)
   })
   blocks_mid.map(function (block) {
    block.scale_to(1)
   })
   blocks_post.map(function (block, index) {
-   block.scale_to((blocks_around_count - index) / (1 + blocks_around_count))
+   block.scale_to((blocks_around_count - index - 1) / blocks_around_count)
   })
  }
  addEventListener('resize', render)

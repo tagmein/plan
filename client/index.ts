@@ -1,6 +1,7 @@
 import './environment'
 
 import { add_style } from './lib/add_style'
+import { DELAY } from './lib/constants'
 import { create_app } from './lib/create_app'
 import { create_tables } from './lib/create_tables'
 
@@ -22,19 +23,32 @@ body {
 }
 `
 
+let internal_path: string = location.hash.substring(1)
+let write_location_timeout: NodeJS.Timeout
+
 const app = create_app(function (path: string) {
- location.hash = path
+ route(path)
+ clearTimeout(write_location_timeout)
+ write_location_timeout = setTimeout(function () {
+  location.hash = internal_path
+ }, DELAY.LONG)
 })
 
-function route() {
- app.route(location.hash.substring(1))
+function route(path: string) {
+ internal_path = path
+ app.route(internal_path)
 }
 
 async function main() {
  document.body.appendChild(app.schedule)
  document.body.appendChild(app.workspace)
- addEventListener('hashchange', route)
- route()
+ addEventListener('hashchange', function () {
+  const next_path = location.hash.substring(1)
+  if (next_path !== internal_path) {
+   route(next_path)
+  }
+ })
+ route(internal_path)
  await create_tables()
 }
 
