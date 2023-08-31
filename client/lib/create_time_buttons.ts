@@ -1,4 +1,4 @@
-import { MONTH_NAMES } from './constants'
+import { DELAY, MONTH_NAMES } from './constants'
 import {
  generate_day_options,
  generate_hour_options,
@@ -50,17 +50,25 @@ export function create_time_buttons(
  const select_time = TIME_PROPERTY_ARRAY.map(function (time_property, index) {
   return function () {
    const options = time_options[time_property]
-   select(
-    control[time_property],
-    typeof options === 'function'
-     ? options(
-        parseInt(control.selected_time[0], 10),
-        parseInt(control.selected_time[1], 10),
-       )
-     : options,
-    set_time_property[time_property].and(select_time?.[index + 1]),
-    control.selected_time[TIME_PROPERTY_ARRAY.indexOf(time_property)],
-   )
+   select({
+    element: control[time_property],
+    options:
+     typeof options === 'function'
+      ? options(
+         parseInt(control.selected_time[0], 10),
+         parseInt(control.selected_time[1], 10),
+        )
+      : options,
+    on_select: set_time_property[time_property].and(function () {
+     setTimeout(function () {
+      select_time[index + 1]?.()
+     }, DELAY.SHORT)
+    }),
+    go_next: select_time[(index + 1) % 4],
+    go_prev: select_time[(index + 3) % 4],
+    selected_value:
+     control.selected_time[TIME_PROPERTY_ARRAY.indexOf(time_property)],
+   })
   }
  }) as [() => void, () => void, () => void, () => void]
  const control: TimeButtonsControl = {
