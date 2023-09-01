@@ -78,7 +78,7 @@ export function create_time_buttons(
    clearInterval(auto_time_interval)
    if (year === '') {
     use_current_time()
-    auto_time_interval = setInterval(use_current_time, 60e3)
+    auto_time_interval = setInterval(use_current_time, DELAY.MINUTE)
    } else {
     const current_time = get_current_time()
     control.selected_time = [year, month, day, hour].map(

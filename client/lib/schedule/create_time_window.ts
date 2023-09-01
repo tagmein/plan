@@ -1,5 +1,6 @@
-import { App } from '../create_app'
 import { add_style } from '../add_style'
+import { DELAY } from '../constants'
+import { App } from '../create_app'
 import {
  TimeArray,
  generate_next_hours,
@@ -41,9 +42,9 @@ export function create_time_window(app: App): TimeWindowControl {
    clearInterval(auto_time_interval)
    if (year === '') {
     use_current_time()
-    auto_time_interval = setInterval(use_current_time, 60e3)
+    auto_time_interval = setInterval(use_current_time, DELAY.MINUTE)
    } else {
-    auto_time_interval = setInterval(render, 60e3)
+    auto_time_interval = setInterval(render, DELAY.MINUTE)
     const current_time = get_current_time()
     control.selected_time = [year, month, day, hour].map(
      function (time, index) {
