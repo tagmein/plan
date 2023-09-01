@@ -20,7 +20,7 @@ export interface TimeButtonsControl {
  day: HTMLButtonElement
  hour: HTMLButtonElement
  selected_time: TimeArray
- set_time(year: string, month: string, day: string, hour: string): void
+ set_time(year: number, month: number, day: number, hour: number): void
 }
 
 const time_options: {
@@ -37,10 +37,10 @@ const time_options: {
 export function create_time_buttons(
  create_button: (label: string, on_click: () => void) => HTMLButtonElement,
  on_change_time: (
-  year: string,
-  month: string,
-  day: string,
-  hour: string,
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
  ) => void,
 ): TimeButtonsControl {
  let auto_time_interval: NodeJS.Timeout
@@ -51,10 +51,7 @@ export function create_time_buttons(
     element: control[time_property],
     options:
      typeof options === 'function'
-      ? options(
-         parseInt(control.selected_time[0], 10),
-         parseInt(control.selected_time[1], 10),
-        )
+      ? options(control.selected_time[0], control.selected_time[1])
       : options,
     on_select: set_time_property[time_property].and(function () {
      setTimeout(function () {
@@ -64,30 +61,38 @@ export function create_time_buttons(
     go_next: select_time[(index + 1) % 4],
     go_prev: select_time[(index + 3) % 4],
     selected_value:
-     control.selected_time[TIME_PROPERTY_ARRAY.indexOf(time_property)],
+     control.selected_time[TIME_PROPERTY_ARRAY.indexOf(time_property)].toString(
+      10,
+     ),
    })
   }
  }) as [() => void, () => void, () => void, () => void]
  const control: TimeButtonsControl = {
-  selected_time: ['', '', '', ''],
+  selected_time: [NaN, NaN, NaN, NaN],
   year: /* */ create_button('Year', /* */ select_time[0]),
   month: /**/ create_button('Month', /**/ select_time[1]),
   day: /*  */ create_button('Day', /*  */ select_time[2]),
   hour: /* */ create_button('Hour', /* */ select_time[3]),
   set_time(year, month, day, hour) {
    clearInterval(auto_time_interval)
-   if (year === '') {
+   if (isNaN(year)) {
     use_current_time()
     auto_time_interval = setInterval(use_current_time, DELAY.MINUTE)
    } else {
     const current_time = get_current_time()
     control.selected_time = [year, month, day, hour].map(
      function (time, index) {
-      const int = parseInt(time, 10)
-      return isNaN(int) ? current_time[index] : int.toString(10)
+      return isNaN(time) ? current_time[index] : time
      },
     ) as TimeArray
-    set_time_button_labels(...control.selected_time)
+    set_time_button_labels(
+     ...(control.selected_time.map((x) => x.toString(10)) as [
+      string,
+      string,
+      string,
+      string,
+     ]),
+    )
    }
   },
  }
@@ -104,38 +109,43 @@ export function create_time_buttons(
  }
  function use_current_time() {
   control.selected_time = get_current_time()
-  set_time_button_labels(...control.selected_time)
+  set_time_button_labels(
+   ...(control.selected_time.map((x) => x.toString(10)) as [
+    string,
+    string,
+    string,
+    string,
+   ]),
+  )
  }
  const set_time_property = {
   year(year: string) {
+   const year_int = parseInt(year, 10)
    const [_, month, day, hour] = control.selected_time
-   const new_valid_days = generate_day_options(
-    parseInt(year, 10),
-    parseInt(month, 10),
-   )
-   const final_day = new_valid_days.some(([value]) => value === day)
+   const new_valid_days = generate_day_options(year_int, month)
+   const day_string = day.toString(10)
+   const final_day = new_valid_days.some(([value]) => value === day_string)
     ? day
-    : new_valid_days[new_valid_days.length - 1][0]
-   on_change_time(year, month, final_day, hour)
+    : parseInt(new_valid_days[new_valid_days.length - 1][0], 10)
+   on_change_time(year_int, month, final_day, hour)
   },
   month(month: string) {
+   const month_int = parseInt(month, 10)
    const [year, _, day, hour] = control.selected_time
-   const new_valid_days = generate_day_options(
-    parseInt(year, 10),
-    parseInt(month, 10),
-   )
-   const final_day = new_valid_days.some(([value]) => value === day)
+   const new_valid_days = generate_day_options(year, month_int)
+   const day_string = day.toString(10)
+   const final_day = new_valid_days.some(([value]) => value === day_string)
     ? day
-    : new_valid_days[new_valid_days.length - 1][0]
-   on_change_time(year, month, final_day, hour)
+    : parseInt(new_valid_days[new_valid_days.length - 1][0], 10)
+   on_change_time(year, month_int, final_day, hour)
   },
   day(day: string) {
    const [year, month, _, hour] = control.selected_time
-   on_change_time(year, month, day, hour)
+   on_change_time(year, month, parseInt(day, 10), hour)
   },
   hour(hour: string) {
    const [year, month, day, _] = control.selected_time
-   on_change_time(year, month, day, hour)
+   on_change_time(year, month, day, parseInt(hour, 10))
   },
  }
 

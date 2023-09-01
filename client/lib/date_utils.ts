@@ -70,25 +70,24 @@ export const TIME_PROPERTY_ARRAY: [
  TimePropertyName,
 ] = ['year', 'month', 'day', 'hour']
 
-export type TimeArray = [string, string, string, string]
+export type TimeArray = [number, number, number, number]
 
-export function get_current_time() {
+export function get_current_time(): TimeArray {
  const now = new Date()
  const year = now.getFullYear()
  const month = now.getMonth() + 1
  const day = now.getDate()
  const hour = now.getHours()
- return [year, month, day, hour].map((x) => x.toString(10)) as TimeArray
+ return [year, month, day, hour]
 }
 
 export function generate_previous_hours(
- year: string,
- month: string,
- day: string,
- hour: string,
+ Y: number,
+ M: number,
+ D: number,
+ H: number,
  count: number,
 ): TimeArray[] {
- let [Y, M, D, H] = [year, month, day, hour].map((x) => parseInt(x, 10))
  const times: TimeArray[] = []
  for (let i = 0; i < count; i++) {
   H--
@@ -106,19 +105,18 @@ export function generate_previous_hours(
    }
    H = 23
   }
-  times.unshift([Y, M, D, H].map((x) => x.toString(10)) as TimeArray)
+  times.unshift([Y, M, D, H])
  }
  return times
 }
 
 export function generate_next_hours(
- year: string,
- month: string,
- day: string,
- hour: string,
+ Y: number,
+ M: number,
+ D: number,
+ H: number,
  count: number,
 ): TimeArray[] {
- let [Y, M, D, H] = [year, month, day, hour].map((x) => parseInt(x, 10))
  const times: TimeArray[] = []
  let max_days_in_month = is_leap_year(Y)
   ? DAYS_IN_MONTH_LEAP_YEAR[M - 1]
@@ -140,9 +138,17 @@ export function generate_next_hours(
    }
    H = 0
   }
-  times.push([Y, M, D, H].map((x) => x.toString(10)) as TimeArray)
+  times.push([Y, M, D, H])
  }
  return times
+}
+
+export function get_next_hour(hour: TimeArray) {
+ return generate_next_hours(...hour, 1).pop()!
+}
+
+export function get_previous_hour(hour: TimeArray) {
+ return generate_previous_hours(...hour, 1).shift()!
 }
 
 export function time_is_equal(a: TimeArray, b: TimeArray) {
@@ -151,4 +157,39 @@ export function time_is_equal(a: TimeArray, b: TimeArray) {
 
 export function get_now_minutes() {
  return new Date().getMinutes()
+}
+
+export function get_hour_delta(base: TimeArray, compare: TimeArray) {
+ let delta = 0
+ const [bY, bM, bD, bH] = base
+ let [cY, cM, cD, cH] = compare
+ if (cH !== bH) {
+  delta += cH - bH
+ }
+ if (cD !== bD) {
+  delta += (cD - bD) * 24
+ }
+ while (cY > bY || cM > bM) {
+  cM--
+  if (cM === 0) {
+   cM = 12
+   cY--
+  }
+  delta +=
+   (is_leap_year(cY)
+    ? DAYS_IN_MONTH_LEAP_YEAR[cM - 1]
+    : DAYS_IN_MONTH_NORMAL_YEAR[cM - 1]) * 24
+ }
+ while (cY < bY || cM < bM) {
+  delta -=
+   (is_leap_year(cY)
+    ? DAYS_IN_MONTH_LEAP_YEAR[cM - 1]
+    : DAYS_IN_MONTH_NORMAL_YEAR[cM - 1]) * 24
+  cM++
+  if (cM === 13) {
+   cM = 1
+   cY++
+  }
+ }
+ return delta
 }

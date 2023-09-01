@@ -64,7 +64,9 @@ export function create_schedule(app: App) {
  schedule.appendChild(schedule.toolbar)
  schedule.appendChild(schedule.time_window.container)
  schedule.route = function (path) {
-  const [_, year = '', month = '', day = '', hour = ''] = path.split('/')
+  const [_, year = NaN, month = NaN, day = NaN, hour = NaN] = path
+   .split('/')
+   .map((x) => parseInt(x, 10))
   schedule.time_buttons.set_time(year, month, day, hour)
   schedule.time_window.set_time(year, month, day, hour)
  }
