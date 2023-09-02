@@ -1,7 +1,8 @@
 import { run_query } from './run_query'
 
 export async function create_tables() {
- const result = await run_query(`
+ const [result_documents, result_events, result_tabs] = await Promise.all([
+  run_query(`
 CREATE TABLE IF NOT EXISTS documents (
  id INTEGER PRIMARY KEY AUTOINCREMENT,
  title TEXT,
@@ -16,12 +17,13 @@ CREATE TABLE IF NOT EXISTS documents (
  priority INTEGER DEFAULT 0,
  FOREIGN KEY (parent_id) REFERENCES documents(id)
 );
-
+`),
+  run_query(`
 CREATE TABLE IF NOT EXISTS events (
  document_id INTEGER NOT NULL,
  start_date DATE NOT NULL,
- start_time_minutes INTEGER,
- duration_minutes INTEGER DEFAULT 60,
+ start_time_minutes INTEGER NOT NULL DEFAULT 0,
+ duration_minutes INTEGER NOT NULL DEFAULT 60,
  muted BOOLEAN DEFAULT 0,
  repeat_until_date DATE,
  repeat_daily BOOLEAN DEFAULT 0,
@@ -32,8 +34,27 @@ CREATE TABLE IF NOT EXISTS events (
  repeat_yearly BOOLEAN DEFAULT 0,
  FOREIGN KEY (document_id) REFERENCES documents(id)
 );
- `)
- if (result.error) {
-  throw new Error('unable to create_tables')
+`),
+  run_query(`
+CREATE TABLE IF NOT EXISTS tabs (
+ document_ids INTEGER[] NOT NULL,
+ is_pinned BOOLEAN NOT NULL DEFAULT 0,
+ is_archived BOOLEAN NOT NULL DEFAULT 0,
+ tab_order INTEGER NOT NULL DEFAULT 0
+);
+ `),
+ ])
+ const error: string[] = []
+ if (result_documents.error) {
+  error.push('unable to create_tables: documents')
+ }
+ if (result_events.error) {
+  error.push('unable to create_tables: events')
+ }
+ if (result_tabs.error) {
+  error.push('unable to create_tables: tabs')
+ }
+ if (error.length) {
+  throw new Error(error.join('; '))
  }
 }

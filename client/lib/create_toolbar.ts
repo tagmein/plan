@@ -5,12 +5,14 @@ add_style`
 .toolbar {
  background-color: #535353;
  border-bottom: 1px solid #1b1b1b;
+ box-shadow: 0 0 8px #505050;
  box-sizing: border-box;
  display: flex;
  flex-direction: row;
  flex-shrink: 0;
  height: 41px;
  overflow: hidden;
+ z-index: 3;
 }
 
 .toolbar button {

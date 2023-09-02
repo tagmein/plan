@@ -129,10 +129,7 @@ export function create_time_window(app: App): TimeWindowControl {
  let wheel_accumulator = 0
  function wheel_commit(steps: number, hour: TimeArray) {
   wheel_accumulator -= steps * WHEEL_HOUR_DISTANCE
-  app.navigate_schedule(
-   [''].concat(hour.map((x) => x.toString(10))).join('/'),
-   true,
-  )
+  app.navigate_schedule(hour.map((x) => x.toString(10)).join('/'), true)
  }
  function process_wheel() {
   const wheel_steps = (wheel_accumulator > 0 ? Math.floor : Math.ceil)(
@@ -272,7 +269,7 @@ export function create_time_window(app: App): TimeWindowControl {
    for (const hour of hours) {
     const y = hour_to_vertical_px(hour)
     control.layer.lineWidth = 1
-    control.layer.strokeStyle = '#808080'
+    control.layer.strokeStyle = '#a8a8a8'
     control.layer.beginPath()
     control.layer.moveTo(0, y)
     control.layer.lineTo(time_window_size.width, y)

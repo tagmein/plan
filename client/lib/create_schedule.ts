@@ -13,7 +13,7 @@ import {
 
 add_style`
 .schedule {
- background-color: #a0a0a0;
+ background-color: #b8b8b8;
  border-right: 1px solid #1b1b1b;
  box-shadow: 0 0 8px #505050;
  display: flex;
@@ -57,14 +57,14 @@ export function create_schedule(app: App) {
  schedule.time_buttons = create_time_buttons(
   schedule.toolbar.add_button,
   function (year, month, day, hour) {
-   app.navigate_schedule(['', year, month, day, hour].join('/'))
+   app.navigate_schedule([year, month, day, hour].join('/'))
   },
  )
  schedule.time_window = create_time_window(app)
  schedule.appendChild(schedule.toolbar)
  schedule.appendChild(schedule.time_window.container)
  schedule.route = function (path, internal) {
-  const [_, year = NaN, month = NaN, day = NaN, hour = NaN] = path
+  const [year = NaN, month = NaN, day = NaN, hour = NaN] = path
    .split('/')
    .map((x) => parseInt(x, 10))
   schedule.time_buttons.set_time(year, month, day, hour)

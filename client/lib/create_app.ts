@@ -31,34 +31,24 @@ export function create_app(
     navigate(paths.join('#'), internal)
    }
   })
+ let last_schedule_path: string | undefined
+ let last_workspace_path: string | undefined
  const app: App = {
   navigate_home: function () {
-   navigate(Array(PATH_PART_COUNT).fill('/').join('#'))
+   navigate(Array(PATH_PART_COUNT).fill('').join('#'))
   },
   navigate_schedule: navigate_part[0],
   navigate_workspace: navigate_part[1],
   route(path, internal) {
    current_path = path
-   const current_parts = get_path_parts()
-   if (
-    current_parts.some(function (part) {
-     return part.length === 0 || !part.startsWith('/')
-    })
-   ) {
-    const fixed_parts = current_parts.map(function (part) {
-     if (part.length === 0) {
-      return '/'
-     } else if (!part.startsWith('/')) {
-      return `/${part}`
-     } else {
-      return part
-     }
-    })
-    navigate(fixed_parts.join('#'))
-   } else {
-    const [schedule_path, workspace_path] = get_path_parts()
+   const [schedule_path, workspace_path] = get_path_parts()
+   if (last_schedule_path !== schedule_path) {
     app.schedule.route(schedule_path, internal)
+    last_schedule_path = schedule_path
+   }
+   if (last_workspace_path !== workspace_path) {
     app.workspace.route(workspace_path, internal)
+    last_workspace_path = workspace_path
    }
   },
   schedule: null as unknown as Schedule,
