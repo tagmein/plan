@@ -287,10 +287,9 @@ export function create_time_window(app: App): TimeWindowControl {
      hour_to_vertical_px(get_next_hour(hour)) - y,
     )
     control.layer.clip()
-    let day_label = ''
+    let day_label: string | undefined
     if (hour[3] === 0) {
-     day_label += ' ' + MONTH_NAMES[hour[1] - 1]
-     day_label += ' ' + ordinal_day(hour[2])
+     day_label = `${MONTH_NAMES[hour[1] - 1]} ${ordinal_day(hour[2])}`
      if (hour[2] === 1) {
       if (hour[1] === 1) {
        day_label += ' ' + hour[0].toString(10).padStart(4, ' ')
@@ -298,17 +297,23 @@ export function create_time_window(app: App): TimeWindowControl {
      }
     }
     control.layer.fillText(
-     `${hour[3].toString(10).padStart(2, ' ')}:00` + day_label,
+     ` ${hour[3].toString(10).padStart(2, ' ')}:00`,
      8,
      y + 17,
     )
+    if (day_label) {
+     control.layer.fillText(day_label, 8, y + 30)
+    }
     control.layer.restore()
     control.layer.fillStyle = '#1b1b1b30'
     control.layer.fillText(
-     `${hour[3].toString(10).padStart(2, ' ')}:00` + day_label,
+     ` ${hour[3].toString(10).padStart(2, ' ')}:00`,
      8,
      y + 17,
     )
+    if (day_label) {
+     control.layer.fillText(day_label, 8, y + 30)
+    }
    }
   }
   const now = get_current_time()
