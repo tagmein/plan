@@ -13,6 +13,7 @@ add_style`
  left: 0;
  right: 0;
  bottom: 0;
+ z-index: 10000;
 }
 
 .select_panel {
@@ -27,6 +28,7 @@ add_style`
  min-width: 42px;
  overflow: hidden;
  position: fixed;
+ z-index: 10001;
 }
 
 .filter_options {
