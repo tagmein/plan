@@ -13,12 +13,12 @@ add_style`
 `
 
 export interface Workspace extends HTMLDivElement {
- route(path: string): void
+ route(path: string, internal?: boolean): void
 }
 
 export function create_workspace(app: App) {
  const workspace = elem('div', 'workspace') as Workspace
- workspace.route = function (path) {
+ workspace.route = function (path, internal) {
   console.log('route workspace', path)
  }
  return workspace

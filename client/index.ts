@@ -26,17 +26,17 @@ body {
 let internal_path: string = location.hash.substring(1)
 let write_location_timeout: NodeJS.Timeout
 
-const app = create_app(function (path: string) {
- route(path)
+const app = create_app(function (path: string, internal?: boolean) {
+ route(path, internal)
  clearTimeout(write_location_timeout)
  write_location_timeout = setTimeout(function () {
   location.hash = internal_path
  }, DELAY.LONG)
 })
 
-function route(path: string) {
+function route(path: string, internal?: boolean) {
  internal_path = path
- app.route(internal_path)
+ app.route(internal_path, internal)
 }
 
 async function main() {

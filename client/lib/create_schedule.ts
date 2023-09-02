@@ -19,7 +19,7 @@ add_style`
  display: flex;
  flex-direction: column;
  overflow: hidden;
- width: 300px;
+ width: 360px;
 }
 
 .schedule .logo {
@@ -41,7 +41,7 @@ add_style`
 `
 
 export interface Schedule extends HTMLDivElement {
- route(path: string): void
+ route(path: string, internal?: boolean): void
  time_buttons: TimeButtonsControl
  time_window: TimeWindowControl
  toolbar: Toolbar
@@ -63,12 +63,12 @@ export function create_schedule(app: App) {
  schedule.time_window = create_time_window(app)
  schedule.appendChild(schedule.toolbar)
  schedule.appendChild(schedule.time_window.container)
- schedule.route = function (path) {
+ schedule.route = function (path, internal) {
   const [_, year = NaN, month = NaN, day = NaN, hour = NaN] = path
    .split('/')
    .map((x) => parseInt(x, 10))
   schedule.time_buttons.set_time(year, month, day, hour)
-  schedule.time_window.set_time(year, month, day, hour)
+  schedule.time_window.set_time(year, month, day, hour, internal)
  }
  return schedule
 }

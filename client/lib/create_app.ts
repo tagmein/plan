@@ -5,12 +5,14 @@ export interface App {
  schedule: Schedule
  workspace: Workspace
  navigate_home(): void
- navigate_schedule(path: string): void
- navigate_workspace(path: string): void
- route(hash: string): void
+ navigate_schedule(path: string, internal?: boolean): void
+ navigate_workspace(path: string, internal?: boolean): void
+ route(hash: string, internal?: boolean): void
 }
 
-export function create_app(navigate: (path: string) => void): App {
+export function create_app(
+ navigate: (path: string, internal?: boolean) => void,
+): App {
  let current_path = ''
  const PATH_PART_COUNT = 2
  function get_path_parts() {
@@ -23,10 +25,10 @@ export function create_app(navigate: (path: string) => void): App {
  const navigate_part = Array(PATH_PART_COUNT)
   .fill(null)
   .map(function (_, index) {
-   return function (new_path: string) {
+   return function (new_path: string, internal?: boolean) {
     const paths = get_path_parts()
     paths[index] = new_path
-    navigate(paths.join('#'))
+    navigate(paths.join('#'), internal)
    }
   })
  const app: App = {
@@ -35,7 +37,7 @@ export function create_app(navigate: (path: string) => void): App {
   },
   navigate_schedule: navigate_part[0],
   navigate_workspace: navigate_part[1],
-  route(path) {
+  route(path, internal) {
    current_path = path
    const current_parts = get_path_parts()
    if (
@@ -55,8 +57,8 @@ export function create_app(navigate: (path: string) => void): App {
     navigate(fixed_parts.join('#'))
    } else {
     const [schedule_path, workspace_path] = get_path_parts()
-    app.schedule.route(schedule_path)
-    app.workspace.route(workspace_path)
+    app.schedule.route(schedule_path, internal)
+    app.workspace.route(workspace_path, internal)
    }
   },
   schedule: null as unknown as Schedule,
